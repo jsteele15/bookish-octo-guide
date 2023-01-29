@@ -1,4 +1,8 @@
-void handle_input(SDL_event event){
+#include <SDL2/SDL.h>
+
+#include "level.h"
+
+void handle_input(SDL_Event event, level* l, mouse* m, cam* c){
     switch(event.type){
         case SDL_MOUSEMOTION:
             if(m->map_sq->surface == NULL){
@@ -7,7 +11,7 @@ void handle_input(SDL_event event){
             m->prev_pos = m->pos;
             m->pos.x = event.motion.x;
             m->pos.y = event.motion.y;
-            update_surface(l, m, c);
+            //update_surface(l, m, c); //Move to graphics func
             break;
 
         case SDL_MOUSEBUTTONDOWN:
@@ -18,11 +22,11 @@ void handle_input(SDL_event event){
         case SDL_KEYDOWN:
             switch (event.key.keysym.sym){
             case SDLK_EQUALS:
-                zoom_in = 1;
+                m->zoom_in = 1;
                 break;
 
             case SDLK_MINUS:
-                zoom_out = 1;
+                m->zoom_out = 1;
                 break;
 
             case SDLK_RIGHT:
@@ -50,11 +54,11 @@ void handle_input(SDL_event event){
                 break;
 
             case SDLK_LSHIFT:
-                shift = 1;
+                m->shift = 1;
                 break;
 
             case SDLK_RSHIFT:
-                shift = 1;
+                m->shift = 1;
                 break;
             }
             break;
@@ -62,26 +66,26 @@ void handle_input(SDL_event event){
         case SDL_KEYUP:
             switch (event.key.keysym.sym){
             case SDLK_EQUALS:
-                if(zoom_in && c->s_max > c->scale){
+                if(m->zoom_in && c->s_max > c->scale){
                 c->scale += 1;
                 //to-do: Fix zoom texture glitch
-                zoom_in = 0; 
+                m->zoom_in = 0; 
                 }
                 break;
 
             case SDLK_MINUS:
-                if(zoom_out && c->s_min < c->scale ){
+                if(m->zoom_out && c->s_min < c->scale ){
                 c->scale -= 1;
-                zoom_out = 0;
+                m->zoom_out = 0;
                 }
                 break;
 
             case SDLK_LSHIFT:
-                shift = 0;
+                m->shift = 0;
                 break;
 
             case SDLK_RSHIFT:
-                shift = 0;
+                m->shift = 0;
                 break;
             }
             break;

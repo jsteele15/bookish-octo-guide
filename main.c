@@ -6,12 +6,10 @@
 
 #include "def.h"
 #include "level.h"
+#include "input.h"
 
 /*FUNCTIONS*/
 
-int m_sq(int x, cam* c){ //Calc current mouse square
-  return (x-x%SQ_SIZE*c->scale)/(SQ_SIZE*c->scale);
-}
 
 void update_surface(level* l, mouse* m, cam* c){
   m->pos.x -= c->offset.x;
@@ -78,11 +76,8 @@ int main() {
   mouse* m = mouse_init();
   toolbar* t = toolbar_init();
 
-  m->sq = square_init("./factory.bmp");
+  m->sq = square_init("./factory.bmp");//remove once tools are setup
 
-  int shift = 0;
-  int zoom_in = 0;
-  int zoom_out = 0;
 
   /******************
    * MAIN GAME LOOP *
@@ -90,99 +85,10 @@ int main() {
    ******************/
 
   while (!(event.type == SDL_QUIT)){
-    int prev_time = l->time;
-    l->time = SDL_GetTicks();
-    l->frame_time = (l->time - prev_time);
+    update_clock(l);
 
     while(SDL_PollEvent(&event)){
-      
-    } //Get events 
-    switch(event.type){
-      case SDL_MOUSEMOTION:
-        if(m->map_sq->surface == NULL){
-          m->map_sq->surface = l->map[m_sq(m->pos.x, c)][m_sq(m->pos.y, c)]->surface;
-        }
-        m->prev_pos = m->pos;
-        m->pos.x = event.motion.x;
-        m->pos.y = event.motion.y;
-        update_surface(l, m, c);
-        break;
-
-      case SDL_MOUSEBUTTONDOWN:
-        l->map[m_sq(m->pos.x, c)][m_sq(m->pos.y, c)]->surface = SDL_LoadBMP("./factory.bmp");
-        m->map_sq->surface = l->map[m_sq(m->pos.x, c)][m_sq(m->pos.y, c)]->surface;
-        break;
-
-      case SDL_KEYDOWN:
-        switch (event.key.keysym.sym){
-          case SDLK_EQUALS:
-            zoom_in = 1;
-            break;
-
-          case SDLK_MINUS:
-            zoom_out = 1;
-            break;
-
-          case SDLK_RIGHT:
-            if(c->offset.x > c->o_max.x*c->scale){
-              c->offset.x -= c->speed*l->frame_time;
-            }
-            break;
-
-          case SDLK_LEFT:
-            if(c->offset.x < c->o_min.x*c->scale){
-              c->offset.x += c->speed*l->frame_time;
-            }
-            break;
-
-          case SDLK_UP:
-            if(c->offset.y < c->o_min.y*c->scale){
-              c->offset.y += c->speed*l->frame_time;
-            }
-            break;
-
-          case SDLK_DOWN:
-            if(c->offset.y > c->o_max.y*c->scale){
-              c->offset.y -= c->speed*l->frame_time;
-            }
-            break;
-
-          case SDLK_LSHIFT:
-            shift = 1;
-            break;
-
-          case SDLK_RSHIFT:
-            shift = 1;
-            break;
-        }
-        break;
-
-      case SDL_KEYUP:
-        switch (event.key.keysym.sym){
-          case SDLK_EQUALS:
-            if(zoom_in && c->s_max > c->scale){
-              c->scale += 1;
-              //to-do: Fix zoom texture glitch
-              zoom_in = 0; 
-            }
-            break;
-
-          case SDLK_MINUS:
-            if(zoom_out && c->s_min < c->scale ){
-              c->scale -= 1;
-              zoom_out = 0;
-            }
-            break;
-
-          case SDLK_LSHIFT:
-            shift = 0;
-            break;
-
-          case SDLK_RSHIFT:
-            shift = 0;
-            break;
-        }
-        break;
+      handle_input(event, l, m, c);
     }
 
     update_view(l, m, c, t, screen);

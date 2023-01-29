@@ -26,6 +26,9 @@ typedef struct mouse_{
     ivec2 prev_pos;
     square* sq;
     square* map_sq;
+    int shift;
+    int zoom_in;
+    int zoom_out;
 }mouse;
 
 typedef struct toolbar_{
@@ -48,3 +51,7 @@ mouse* mouse_init();
 toolbar* toolbar_init();
 
 level* level_init();
+
+int m_sq(int x, cam* c);
+
+void update_clock(level* l);

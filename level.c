@@ -10,7 +10,7 @@ square* square_init(const char* file){
 
 cam* cam_init(){
   cam* c = (cam*)calloc(1, sizeof(cam));
-  c->speed = .5;
+  c->speed = 10;
 
   c->o_max.x = -(L_WIDTH*16 - WIDTH);
   c->o_max.y = -(L_HEIGHT*16 - HEIGHT);
@@ -55,4 +55,14 @@ level* level_init(){
       }
   }
   return l;
+}
+
+int m_sq(int x, cam* c){ //Calc current mouse square
+  return (x-x%SQ_SIZE*c->scale)/(SQ_SIZE*c->scale);
+}
+
+void update_clock(level* l){
+  int prev_time = l->time;
+  l->time = SDL_GetTicks();
+  l->frame_time = (l->time - prev_time);
 }
