@@ -2,119 +2,11 @@
 #include <stdlib.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
+#include <stddef.h>
 
-/*DEFINITIONS*/
-#define L_HEIGHT 64 //level height
-#define L_WIDTH 64 //level width
-#define HEIGHT 500 
-#define WIDTH 700 
-#define SQ_SIZE 16
+#include "def.h"
+#include "level.h"
 
-int DEBUG = 0;
-
-/*STRUCTURES & FUNCS*/
-
-typedef struct ivec2_{
-  int x;
-  int y;
-}ivec2;
-
-typedef struct fvec2_{
-  float x;
-  float y;
-}fvec2;
-
-typedef struct square_{
-    struct square_* above;
-    struct square_* below;
-    struct square_* left;
-    struct square_* right;
-    SDL_Surface* surface;
-    SDL_Rect rect;
-}square;
-
-square* square_init(const char* file){
-  square* sq = (square*)calloc(1, sizeof(square));
-  sq->surface = SDL_LoadBMP(file);
-  return sq;
-}
-
-typedef struct cam_{
-  int scale;
-  fvec2 offset;
-  ivec2 o_min;
-  ivec2 o_max;
-  float speed;
-  int s_min;
-  int s_max;
-  
-}cam;
-
-cam* cam_init(){
-  cam* c = (cam*)calloc(1, sizeof(cam));
-  c->speed = .5;
-
-  c->o_max.x = -(L_WIDTH*16 - WIDTH);
-  c->o_max.y = -(L_HEIGHT*16 - HEIGHT);
-
-  c->scale = 1;
-  c->s_min = 1;
-  c->s_max = 4;
-  return c;
-}
-
-typedef struct mouse_{
-    ivec2 pos;
-    ivec2 prev_pos;
-    square* sq;
-    square* map_sq;
-  }mouse;
-
-mouse* mouse_init(){
-  mouse* m = (mouse*)calloc(1, sizeof(mouse));
-  m->pos.x = -1;
-  m->pos.y = -1;
-  m->map_sq = (square*)calloc(1, sizeof(square));
-  m->sq =(square*)calloc(1, sizeof(square));
-  return m;
-}
-
-typedef struct toolbar_{
-  square* sq;
-  square* tool[4];
-}toolbar;
-
-toolbar* toolbar_init(){
-  toolbar* t = (toolbar*)calloc(1, sizeof(toolbar));
-  t->sq = (square*)calloc(1, sizeof(square));
-  for(int i = 0; i < 4; i++){
-    t->tool[i] = (square*)calloc(4, sizeof(square));
-  }
-  t->sq = square_init("./factory.bmp");
-  t->sq->rect.h = HEIGHT;
-  t->sq->rect.w = 40;
-  return t;
-}
-
-typedef struct level_{
-  square* map[L_WIDTH][L_HEIGHT];
-  unsigned long int time;
-  int frame_time;
-} level;
-
-level* level_init(){
-  level* l = (level*)calloc(1, sizeof(level));
-  for (size_t i = 0; i < L_WIDTH; i++){
-      for (size_t j = 0; j < L_HEIGHT; j++){
-          l->map[i][j] = square_init("./grass.bmp");
-          l->map[i][j]->rect.x = i*SQ_SIZE;
-          l->map[i][j]->rect.y = j*SQ_SIZE;
-          l->map[i][j]->rect.w = SQ_SIZE;
-          l->map[i][j]->rect.h = SQ_SIZE;
-      }
-  }
-  return l;
-}
 /*FUNCTIONS*/
 
 int m_sq(int x, cam* c){ //Calc current mouse square
@@ -157,7 +49,7 @@ void update_view(level* l, mouse* m, cam* c, toolbar* t, SDL_Surface* screen){
   }
   SDL_FillRect(screen, NULL, 4294967295); //int = 2^32-1: White
 
-  SDL_BlitScaled(t->sq->surface, NULL, screen, &t->sq->rect); //SEGFAULT 
+  SDL_BlitScaled(t->sq->surface, NULL, screen, &t->sq->rect);  
 
   for(int i = 0; i<L_WIDTH; i++){
     for (int j = 0; j < L_HEIGHT; j++){
@@ -202,7 +94,9 @@ int main() {
     l->time = SDL_GetTicks();
     l->frame_time = (l->time - prev_time);
 
-    SDL_PollEvent(&event); //Get events 
+    while(SDL_PollEvent(&event)){
+      
+    } //Get events 
     switch(event.type){
       case SDL_MOUSEMOTION:
         if(m->map_sq->surface == NULL){

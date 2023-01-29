@@ -1,2 +1,2 @@
 level_editor: main.c
-	g++ -o level_editor main.c -lm -I/usr/lib/i386-linux-gnu -lSDL2
+	gcc -o level_editor main.c level.c -lm -I/usr/lib/i386-linux-gnu -lSDL2
