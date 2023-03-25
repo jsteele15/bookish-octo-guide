@@ -1,9 +1,10 @@
 #include <SDL2/SDL.h>
 
 #include "level.h"
-
+/*hello world*/
 void handle_input(SDL_Event event, level* l, mouse* m, cam* c){
-    switch(event.type){
+    
+	switch(event.type){
         case SDL_MOUSEMOTION:
             if(m->map_sq->surface == NULL){
             m->map_sq->surface = l->map[m_sq(m->pos.x, c)][m_sq(m->pos.y, c)]->surface;
